@@ -1,0 +1,20 @@
+#!/bin/sh
+
+# Tell stow where to find my packages.
+STOW_DIR="$PWD/$(dirname "$0")/dotfiles/"
+# Disable tree folding.
+STOW_OPTIONS="--no-folding"
+
+echo "Using STOW_DIR=$STOW_DIR ..."
+
+if [ \( -z "$1" \) -o \( "$1" = "stow" \) ]; then
+  stow -d "$STOW_DIR" -t "$XDG_CONFIG_HOME" --restow config $STOW_OPTIONS
+elif [ "$1" = "unstow" ]; then
+  stow -d "$STOW_DIR" -t "$XDG_CONFIG_HOME" --delete config $STOW_OPTIONS
+elif [ "$1" = "check" ]; then
+  chkstow -t "$XDG_CONFIG_HOME" --badlinks
+else
+  echo "Invalid command: $1"
+  echo "Usage: $(basename $0) [stow|unstow|check]"
+fi
+

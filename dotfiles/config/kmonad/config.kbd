@@ -1,0 +1,66 @@
+(defcfg
+  input (device-file "/dev/input/by-path/platform-i8042-serio-0-event-kbd")
+  output (uinput-sink "KMonad virtual output")
+  fallthrough true)
+
+;; System 76 Darter Pro (darp9)
+(defsrc
+  esc  f1  f2  f3  f4  f5  f6  f7  f8  f9  f10  f11  f12  prnt  ins  del  home end  pgup pgdn
+  grv  1    2    3    4    5    6    7    8    9    0    -    =     bspc  nlck kp/  kp*  kp-
+  tab  q    w    e    r    t    y    u    i    o    p    [    ]        \  kp7  kp8  kp9  kp+
+  caps a    s    d    f    g    h    j    k    l    ;    '           ret  kp4  kp5  kp6
+  lsft z    x    c    v    b    n    m    ,    .    /    rsft         up  kp1  kp2  kp3  kprt
+  lctl lmet lalt           spc            ralt cmp       rctl  left down rght  kp0  kp.
+)
+
+;; System 76 Darter Pro (darp9) with XKB (layout=us, variant=colemak_dh, options=caps:swapescape)
+;;(defsrc
+;;  caps f1  f2  f3  f4  f5  f6  f7  f8  f9  f10  f11  f12  prnt  ins  del  home end  pgup pgdn
+;;  grv  1    2    3    4    5    6    7    8    9    0    -    =     bspc  nlck kp/  kp*  kp-
+;;  tab  q    w    f    p    b    j    l    u    y    ;    [    ]        \  kp7  kp8  kp9  kp+
+;;  esc  a    r    s    t    g    m    n    e    i    o    '           ret  kp4  kp5  kp6
+;;  lsft x    c    d    v    z    k    h    ,    .    /    rsft         up  kp1  kp2  kp3  kprt
+;;  lctl lmet lalt           spc            ralt cmp       rctl  left down rght  kp0  kp.
+;;)
+
+(defalias
+  ext (tap-next esc (layer-toggle extend))
+  ck  (layer-switch colemak-dh)
+  qy  (layer-switch qwerty)
+)
+
+(deflayer colemak-dh
+  _    _   _   _   _   _   _   _   _   _   _    _    _    _     _  _  _ _ _ _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _  _ _ _ _
+  _    q    w    f    p    b    j    l    u    y    ;    _    _    _  _ _ _ _
+  @ext a    r    s    t    g    m    n    e    i    o    _         _  _ _ _ 
+  _    x    c    d    v    z    k    h    _    _    _    _         _  _ _ _ _
+  _    _    _              _              _    _         _     _   _ _  _ _
+)
+
+(deflayer extend
+  _ _   _   _   _   _   _   _   _   _   _    _    _    _     _  _  _ _ _ _
+  _ @ck  @qy  _    _    _    _    _    _    _    _    _    _    _  _ _ _ _
+  _ _    _    _    _    _    _    _    _    _    _    _    _    _  _ _ _ _
+  _ _    _    _    _    _    _    down up   left rght _         _  _ _ _ 
+  _ _    _    _    _    _    _    _    _    _    _    _         _  _ _ _ _
+  _ _    _              _              _    _         _     _   _ _  _ _
+)
+
+(deflayer qwerty
+  _    _   _   _   _   _   _   _   _   _   _    _    _    _     _  _  _ _ _ _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _  _ _ _ _
+  _    q    w    e    r    t    y    u    i    o    p    _    _    _  _ _ _ _
+  @ext a    s    d    f    g    h    j    k    l    ;    _         _  _ _ _ 
+  _    z    x    c    v    b    n    m    _    _    _    _         _  _ _ _ _
+  _    _    _              _              _    _         _     _   _ _  _ _
+)
+
+(deflayer template
+  _ _   _   _   _   _   _   _   _   _   _    _    _    _     _  _  _ _ _ _
+  _ _    _    _    _    _    _    _    _    _    _    _    _    _  _ _ _ _
+  _ _    _    _    _    _    _    _    _    _    _    _    _    _  _ _ _ _
+  _ _    _    _    _    _    _    _    _    _    _    _         _  _ _ _ 
+  _ _    _    _    _    _    _    _    _    _    _    _         _  _ _ _ _
+  _ _    _              _              _    _         _     _   _ _  _ _
+)
