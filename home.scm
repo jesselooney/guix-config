@@ -9,10 +9,32 @@
              (gnu home services fontutils)
              (gnu home services guix)
              (gnu home services shells)
+             (gnu home services shepherd)
              (gnu home services ssh)
              (gnu packages)
+             (gnu packages haskell-apps)
              (gnu services)
-             (guix channels))
+             (guix channels)
+             (guix gexp))
+
+(define kmonad-shepherd-service (lambda (_) (list
+  (shepherd-service
+    (provision '(kmonad-daemon))
+    (documentation "Run the KMonad daemon (kmonad-daemon).")
+    (start #~(make-forkexec-constructor
+      ;; Consider using local-file to host the config in the Guix store.
+      (list
+        #$(file-append kmonad "/bin/kmonad")
+        #$(local-file "config/kmonad/config.kbd" "kmonad-config.kbd"))))
+    (stop #~(make-kill-destructor))
+    (auto-start? #f)))))
+
+(define kmonad-service-type (service-type
+  (name 'kmonad)
+  (description "Register a home Shepherd service to run a KMonad daemon.")
+  (extensions (list 
+    (service-extension home-shepherd-service-type kmonad-shepherd-service)))
+  (default-value #f)))
 
 (home-environment
   ;; Below is the list of packages that will show up in your
@@ -49,7 +71,9 @@
   ;; services, run 'guix home search KEYWORD' in a terminal.
   (services (list
     ;; Configure fish to use Guix
-    (service home-fish-service-type)
+    (simple-service 'my-fish-service home-fish-service-type (home-fish-extension
+      (aliases
+        '(("g" . "git")))))
 
     ;; Configure fontconfig
     (simple-service 'my-fontconfig-service home-fontconfig-service-type
@@ -73,19 +97,11 @@
         (openssh-host
           (name "*")
           (identity-file "~/.ssh/id_ed25519"))))
-      (add-keys-to-agent "yes")))
+      (add-keys-to-agent "yes"))) ;; This setting is not working as I expected.
 
     (service home-ssh-agent-service-type (home-ssh-agent-configuration
-      (extra-options '("-t" "15m")))))))
+      (extra-options '("-t" "15m"))))
 
+    ;; Register (not auto-start) a service to run a KMonad daemon.
+    (service kmonad-service-type))))
 
-;;(define kmonad
-;;  (service
-;;    '(kmonad-daemon)
-;;    #:start (make-forkexec-constructor
-;;      '("$HOME_ENVIRONMENT/profile/bin/kmonad" "$XDG_CONFIG_HOME/kmonad/config.kbd"))
-;;    #:stop (make-kill-destructor)
-;;    #:respawn? #t))
-
-;;(register-services (list kmonad))
-;;(start-in-the-background '(kmonad))

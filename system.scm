@@ -7,6 +7,24 @@
 
 ;; Most of this is from a minimalist example in "Using the Configuration System" in the GNU Guix manual.
 
+;; From https://lists.gnu.org/archive/html/help-guix/2023-12/msg00130.html
+(define swaylock-pam-service-type
+(service-type 
+	(name 'swaylock-pam)
+	(description "swaylock needs /etc/pam.d/swaylock configuration.")
+	(extensions (list
+		(service-extension pam-root-service-type
+			(lambda (_) (list
+				(pam-service
+					(name "swaylock")
+					(auth (list 
+						(pam-entry
+							(control "include")
+							(module "login"))))))))))
+	(default-value #f)))
+
+
+
 (operating-system
 	;; Icky nonfree firmware stuff
 	(kernel linux)
@@ -60,13 +78,14 @@
 			"kmonad"))
 		%base-packages))
 
-	(services (modify-services
+		(services (modify-services
 		(cons*
 			(service bluetooth-service-type)
 			(service nftables-service-type)
 			(service openssh-service-type (openssh-configuration
 				(permit-root-login #f)
 				(password-authentication? #f)))
+			(service swaylock-pam-service-type)
 			%desktop-services)
 
 		(guix-service-type config => (guix-configuration

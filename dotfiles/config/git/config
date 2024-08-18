@@ -4,3 +4,11 @@
 [user]
   name = "Jesse Looney"
   email = "42242696+jesselooney@users.noreply.github.com"
+
+[alias]
+  s = status -s
+  st = status
+  co = checkout
+  cob = checkout -b
+  a = add
+  cm = commit -m
